@@ -15,8 +15,8 @@ public class Node {
     @Column(name = "texto")
     private String texto;
 
-    @Column(name = "altura_atual")
-    private int alturaAtual = 0;
+    @Column(name = "nivel_atual")
+    private int nivelAtual = 0;
 
     @ManyToOne
     private Node nodeDireito;
@@ -72,20 +72,20 @@ public class Node {
         return this.texto;
     }
 
-    public void adicionarAltura(){
-        this.alturaAtual++;
+    public void adicionarNivel(){
+        this.nivelAtual++;
     }
 
-    public void removerAltura(){
-        this.alturaAtual--;
+    public void removerNivel(){
+        this.nivelAtual--;
     }
 
-    public int getAlturaAtual() {
-        return alturaAtual;
+    public int getNivelAtual() {
+        return nivelAtual;
     }
 
-    public void setAlturaAtual(int alturaAtual) {
-        this.alturaAtual = alturaAtual;
+    public void setNivelAtual(int nivelAtual) {
+        this.nivelAtual = nivelAtual;
     }
 
     @Override
@@ -93,11 +93,11 @@ public class Node {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Node node = (Node) o;
-        return alturaAtual == node.alturaAtual && Objects.equals(id, node.id) && Objects.equals(texto, node.texto) && Objects.equals(nodeDireito, node.nodeDireito) && Objects.equals(nodeEsquerdo, node.nodeEsquerdo);
+        return nivelAtual == node.nivelAtual && Objects.equals(id, node.id) && Objects.equals(texto, node.texto) && Objects.equals(nodeDireito, node.nodeDireito) && Objects.equals(nodeEsquerdo, node.nodeEsquerdo);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, texto, alturaAtual, nodeDireito, nodeEsquerdo);
+        return Objects.hash(id, texto, nivelAtual, nodeDireito, nodeEsquerdo);
     }
 }
