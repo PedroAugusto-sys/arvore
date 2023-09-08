@@ -1,16 +1,20 @@
 package br.com.capisoft.arvores.models;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.GenericGenerator;
 
 import java.util.Objects;
+import java.util.UUID;
 
 @Entity
 @Table(name = "node")
 public class Node {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "uuid2")
+    @GenericGenerator(name = "uuid2", strategy = "uuid2")
+    @Column(name = "id", columnDefinition = "BINARY(16)")
+    private UUID id;
 
     @Column(name = "texto")
     private String texto;
@@ -18,22 +22,20 @@ public class Node {
     @Column(name = "nivel_atual")
     private int nivelAtual = 0;
 
+    @Column(name = "altura_atual")
+    private int altura = 0;
+
     @ManyToOne
     private Node nodeDireito;
 
     @ManyToOne
     private Node nodeEsquerdo;
 
+    @Transient
+    private int fatorBalanceamento = 0;
+
     public Node(String texto) {
         this.texto = texto;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Long getId() {
-        return id;
     }
 
     public Node getNoDireito(){
@@ -86,6 +88,30 @@ public class Node {
 
     public void setNivelAtual(int nivelAtual) {
         this.nivelAtual = nivelAtual;
+    }
+
+    public int getFatorBalanceamento() {
+        return fatorBalanceamento;
+    }
+
+    public void setFatorBalanceamento(int fatorBalanceamento) {
+        this.fatorBalanceamento = fatorBalanceamento;
+    }
+
+    public int getAltura() {
+        return altura;
+    }
+
+    public void setAltura(int altura) {
+        this.altura = altura;
+    }
+
+    public void setNodeEsquerdo(Node node){
+        this.nodeEsquerdo = node;
+    }
+
+    public void setNodeDireito(Node node){
+        this.nodeDireito = node;
     }
 
     @Override

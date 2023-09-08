@@ -1,19 +1,24 @@
 package br.com.capisoft.arvores.models;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.GenericGenerator;
+
+import java.util.UUID;
 
 @Entity
 @Table(name = "arvore")
 public class Arvore {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "uuid2")
+    @GenericGenerator(name = "uuid2", strategy = "uuid2")
+    @Column(name = "id", columnDefinition = "BINARY(16)")
+    private UUID id;
 
     @Column(name = "altura")
     private int altura = 0;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     private Node root;
 
     @Transient
@@ -40,14 +45,6 @@ public class Arvore {
 
     public Node getRoot() {
         return root;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Long getId() {
-        return id;
     }
 
     public int getAltura(){

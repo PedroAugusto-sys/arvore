@@ -30,6 +30,6 @@ public class HomeController {
 
     @PostMapping("/arquivo/upload")
     public ResponseEntity uploadArquivo(MultipartFile txt) throws IOException {
-        return arvoresService.arquivoLeituraTeste(txt);
+        return arvoresService.obterTXTMontarArvoreSimples(txt);
     }
 }
