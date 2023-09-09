@@ -125,9 +125,9 @@ public class Node {
 
     @Override
     public String toString() {
-        return "Node{" +
-                "id=" + id +
-                ", texto='" + texto.toUpperCase() + '\'' +
-                '}';
+        return "Node [" +
+                "ID: " + id +
+                " | TEXTO: '" + texto.toUpperCase() + '\'' +
+                ']';
     }
 }

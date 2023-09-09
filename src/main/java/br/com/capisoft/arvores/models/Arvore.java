@@ -93,4 +93,9 @@ public class Arvore {
     public void setRoot(Node node){
         this.root = node;
     }
+
+    @Override
+    public String toString() {
+        return "ARVORE {ID=" + id + ", RAIZ=" + root.toString() + ", isAVL=" + isAVL + '}';
+    }
 }

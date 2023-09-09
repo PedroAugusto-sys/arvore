@@ -25,10 +25,10 @@ public class ArvoresService {
     private ControleArvores arvoreAVL;
 
     @Autowired
-    private ArvoreRepository arvoreHistorico;
+    private ArvoreRepository arvores;
 
     @Autowired
-    private NodeRepository nodeHistorico;
+    private NodeRepository nodes;
 
     public ResponseEntity arquivoLeituraTeste(MultipartFile arquivo) throws IOException {
         dados.adicionarTextoTeste(arquivo);
@@ -36,46 +36,65 @@ public class ArvoresService {
     }
 
     public ResponseEntity obterTXTMontarArvoreSimples(MultipartFile arquivo) throws IOException {
+        Arvore arv = null;
         for (String palavraNode : dados.carregarListaDePalavras(arquivo)){
-            adicionarNaArvore(palavraNode,false);
+            arv = adicionarNaArvore(palavraNode,false);
         }
-        return ResponseEntity.ok("deu bom");
+        return ResponseEntity.ok(salvarArvore(arv));
     }
 
     public ResponseEntity obterTXTEMontarArvoreAVL(MultipartFile arquivo) throws IOException {
+        Arvore arv = null;
         for (String palavraNode : dados.carregarListaDePalavras(arquivo)){
-            adicionarNaArvore(palavraNode,true);
+            arv = adicionarNaArvore(palavraNode,true);
         }
-        return ResponseEntity.ok("deu bom");
+        return ResponseEntity.ok(salvarArvore(arv));
     }
 
     public ResponseEntity adicionarNodeArvoreSimples(String texto){
-        adicionarNaArvore(texto,false);
-        return ResponseEntity.ok("deu bom");
+        Arvore arv = adicionarNaArvore(texto,false);
+        return ResponseEntity.ok(salvarArvore(arv));
     }
 
     public ResponseEntity adicionarNodeArvoreAVL(String texto){
-        adicionarNaArvore(texto, true);
-        return ResponseEntity.ok("deu bom");
+        Arvore arv = adicionarNaArvore(texto, true);
+        return ResponseEntity.ok(salvarArvore(arv));
     }
 
-    private void adicionarNaArvore(String textoNode, boolean isAVL){
+    private Arvore adicionarNaArvore(String textoNode, boolean isAVL){
         Node novoNode = new Node(textoNode);
         Arvore arvore = new Arvore(novoNode, isAVL);
         if (isAVL){
             if(arvoreAVL == null) {
                 LOG.info("Arvore AVL está vazia, vou iniciar ela com o root -> "+novoNode);
-                arvoreAVL = new ControleArvores(arvoreHistorico.save(arvore));
+                arvoreAVL = new ControleArvores(arvore);
             } else {
                 arvoreAVL.adicionarNaArvore(novoNode);
             }
+            return arvoreAVL.getArvore();
         } else {
             if (arvoreSimples == null){
                 LOG.info("Arvore SIMPLES está vazia, vou iniciar ela com o root -> "+novoNode);
-                arvoreSimples = new ControleArvores(arvoreHistorico.save(arvore));
+                arvoreSimples = new ControleArvores(arvore);
             } else {
                 arvoreSimples.adicionarNaArvore(novoNode);
             }
+            return arvoreSimples.getArvore();
         }
+    }
+
+    private Arvore salvarArvore(Arvore arvore){
+        arvore.setRoot(salvarNodes(arvore.getRoot()));
+        return arvores.save(arvore);
+    }
+
+    private Node salvarNodes(Node no){
+        if (no.contemNoEsquerdo()){
+            salvarNodes(no.getNoEsquerdo());
+        }
+        if (no.contemNoDireito()){
+            salvarNodes(no.getNoDireito());
+        }
+        return nodes.save(no);
     }
 }

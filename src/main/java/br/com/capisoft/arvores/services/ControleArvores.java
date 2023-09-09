@@ -5,10 +5,7 @@ import br.com.capisoft.arvores.models.DirecaoNode;
 import br.com.capisoft.arvores.models.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
-@Component
 public class ControleArvores {
 
     private static Logger LOG = LoggerFactory.getLogger(ControleArvores.class);
@@ -29,8 +26,16 @@ public class ControleArvores {
             LOG.info("Arvore está vazia, vou adicionar nova arvore com o root ->"+node.toString());
             arvore.setRoot(node);
         } else {
-            LOG.info("Vou adicionar o node -> "+node.toString());
-            preencherArvore(arvore.getRoot(), node);
+            //Aqui realiza a busca na árvore se tal node já está presente na árvore, se sim apenas acrescenta na contagem de palavras, se não então insere na árvore
+            LOG.info("Vou iniciar uma Busca Binária na arvore "+arvore.toString()+" e verificar se contém o Node "+node.getTexto());
+            Node no = Busca.binariaDaArvore(this.arvore,node.getTexto());
+            if(no != null){
+                LOG.info("Node com texto "+node.getTexto().toUpperCase()+" foi encontrado na árvore, logo, não irei preencher, apenas adicionar a contagem de palavras");
+                arvore.adicionarNaListaDePalavras(node.getTexto());
+            } else {
+                LOG.info("Vou adicionar o node pois foi verificado que o mesmo não foi encontrado na árvore -> "+node.toString());
+                preencherArvore(arvore.getRoot(), node);
+            }
         }
     }
 
@@ -91,13 +96,16 @@ public class ControleArvores {
 
 
     //Adicionando na Arvore
-    private void preencherArvore(Node raiz, Node novoNode){
+    private Node preencherArvore(Node raiz, Node novoNode){
         if (raiz == null){
             raiz = novoNode;
             LOG.info("raiz "+raiz+" vazia, vou adicionar o node de texto ->"+novoNode.getTexto().toUpperCase());
-            adicionarNode(raiz, novoNode, DirecaoNode.NODE_ATUAL);
+            return adicionarNode(raiz, novoNode, DirecaoNode.NODE_ATUAL);
         }
-        int res = raiz.getTexto().compareTo(novoNode.getTexto().toUpperCase());
+        int res = raiz.getTexto()
+                .trim()
+                .toLowerCase()
+                .compareTo(novoNode.getTexto().trim().toLowerCase());
         if (res == 0){
             LOG.info("o novo node "+novoNode+" já está na arvore, vou adicionar a contagem de palavras");
             arvore.adicionarNaListaDePalavras(novoNode.getTexto().toUpperCase());
@@ -106,22 +114,23 @@ public class ControleArvores {
             LOG.info("node central "+raiz.getTexto()+" é maior que o node "+ novoNode.getTexto()+", vou inseri-lo na Esquerda");
             if (raiz.contemNoEsquerdo()){
                 novoNode.adicionarNivel();
-                this.preencherArvore(raiz.getNoEsquerdo(),novoNode);
+                return preencherArvore(raiz.getNoEsquerdo(),novoNode);
             } else {
-                adicionarNode(raiz,novoNode,DirecaoNode.ESQUERDA);
+                return adicionarNode(raiz,novoNode,DirecaoNode.ESQUERDA);
             }
         } else if (res > 0){
             LOG.info("node central "+raiz.getTexto().toUpperCase()+" é menor que o node "+ novoNode.getTexto().toUpperCase()+", vou inseri-lo na Direita");
             if (raiz.contemNoDireito()) {
                 novoNode.adicionarNivel();
-                this.preencherArvore(raiz.getNoDireito(),novoNode);
+                return preencherArvore(raiz.getNoDireito(),novoNode);
             } else {
-                adicionarNode(raiz,novoNode,DirecaoNode.DIREITA);
+                return adicionarNode(raiz,novoNode,DirecaoNode.DIREITA);
             }
         }
+        return null;
     }
 
-    private void adicionarNode(Node raiz, Node novoNode, DirecaoNode direcao){
+    private Node adicionarNode(Node raiz, Node novoNode, DirecaoNode direcao){
         if(direcao == DirecaoNode.NODE_ATUAL){
             LOG.info("o novo node "+novoNode.getTexto().toUpperCase()+" foi adicionado na árvore");
             raiz = novoNode;
@@ -136,5 +145,6 @@ public class ControleArvores {
         novoNode.adicionarNivel();
         arvore.adicionarNaListaDePalavras(novoNode.getTexto());
         //rebalanceamento(raiz);
+        return novoNode;
     }
 }
