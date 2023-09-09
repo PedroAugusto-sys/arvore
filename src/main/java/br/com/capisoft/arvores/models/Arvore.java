@@ -65,15 +65,16 @@ public class Arvore {
     }
 
     public void adicionarNaListaDePalavras(String palavra){
+        String word = palavra.toLowerCase();
         if (this.palavra.size() == 0){
-            this.palavra.add(new Palavra(this,palavra));
+            this.palavra.add(new Palavra(this,word));
         } else {
             Iterator<Palavra> iterator = this.palavra.iterator();
             boolean palavraEncontrada = false;
 
             while (iterator.hasNext()) {
                 Palavra p = iterator.next();
-                if (p.getPalavra().equals(palavra)) {
+                if (p.getPalavra().equals(word)) {
                     p.aumentarContagem();
                     palavraEncontrada = true;
                     break; // Exit the loop since we found the word
@@ -81,7 +82,7 @@ public class Arvore {
             }
 
             if (!palavraEncontrada) {
-                this.palavra.add(new Palavra(this,palavra));
+                this.palavra.add(new Palavra(this,word));
             }
         }
     }
