@@ -16,13 +16,13 @@ public class Palavra {
     private int quantidade = 1;
 
     public Palavra(String palavra){
-        this.palavra = palavra;
+        this.palavra = palavra.toLowerCase();
         this.quantidade = 1;
     }
 
     public Palavra(Arvore arvore,String palavra){
         this.arvore = arvore;
-        this.palavra = palavra;
+        this.palavra = palavra.toLowerCase();
         this.quantidade = 1;
     }
 
