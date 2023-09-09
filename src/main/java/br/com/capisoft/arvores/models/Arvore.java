@@ -1,25 +1,30 @@
 package br.com.capisoft.arvores.models;
 
 import jakarta.persistence.*;
-import org.hibernate.annotations.GenericGenerator;
 
-import java.util.UUID;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 
 @Entity
 @Table(name = "arvore")
 public class Arvore {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "uuid2")
-    @GenericGenerator(name = "uuid2", strategy = "uuid2")
-    @Column(name = "id", columnDefinition = "BINARY(16)")
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "arvore_id")
+    private Long id;
 
     @Column(name = "altura")
     private int altura = 0;
 
     @OneToOne(cascade = CascadeType.ALL)
     private Node root;
+
+    @OneToMany(mappedBy = "arvore", cascade = CascadeType.ALL)
+    private List<Palavra> palavra = new ArrayList<>();
 
     @Transient
     boolean isAVL = false;
@@ -57,6 +62,32 @@ public class Arvore {
 
     public void diminuirAltura(){
         this.altura--;
+    }
+
+    public void adicionarNaListaDePalavras(String palavra){
+        if (this.palavra.size() == 0){
+            this.palavra.add(new Palavra(this,palavra));
+        } else {
+            Iterator<Palavra> iterator = this.palavra.iterator();
+            boolean palavraEncontrada = false;
+
+            while (iterator.hasNext()) {
+                Palavra p = iterator.next();
+                if (p.getPalavra().equals(palavra)) {
+                    p.aumentarContagem();
+                    palavraEncontrada = true;
+                    break; // Exit the loop since we found the word
+                }
+            }
+
+            if (!palavraEncontrada) {
+                this.palavra.add(new Palavra(this,palavra));
+            }
+        }
+    }
+
+    public List<Palavra> getListaDePalavras(){
+        return this.palavra;
     }
 
     public void setRoot(Node node){

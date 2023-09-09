@@ -5,6 +5,8 @@ import br.com.capisoft.arvores.models.Node;
 import br.com.capisoft.arvores.repositories.ArvoreRepository;
 import br.com.capisoft.arvores.repositories.NodeRepository;
 import br.com.capisoft.arvores.utils.Dados;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -14,6 +16,8 @@ import java.io.IOException;
 
 @Service
 public class ArvoresService {
+
+    private static Logger LOG = LoggerFactory.getLogger(ArvoresService.class);
 
     private Dados dados = new Dados();
 
@@ -57,19 +61,18 @@ public class ArvoresService {
 
     private void adicionarNaArvore(String textoNode, boolean isAVL){
         Node novoNode = new Node(textoNode);
-        nodeHistorico.save(novoNode);
         Arvore arvore = new Arvore(novoNode, isAVL);
         if (isAVL){
             if(arvoreAVL == null) {
-                arvoreAVL = new ControleArvores(arvore);
-                arvoreHistorico.save(arvore);
+                LOG.info("Arvore AVL está vazia, vou iniciar ela com o root -> "+novoNode);
+                arvoreAVL = new ControleArvores(arvoreHistorico.save(arvore));
             } else {
                 arvoreAVL.adicionarNaArvore(novoNode);
             }
         } else {
             if (arvoreSimples == null){
-                arvoreSimples = new ControleArvores(arvore);
-                arvoreHistorico.save(arvore);
+                LOG.info("Arvore SIMPLES está vazia, vou iniciar ela com o root -> "+novoNode);
+                arvoreSimples = new ControleArvores(arvoreHistorico.save(arvore));
             } else {
                 arvoreSimples.adicionarNaArvore(novoNode);
             }

@@ -1,20 +1,16 @@
 package br.com.capisoft.arvores.models;
 
 import jakarta.persistence.*;
-import org.hibernate.annotations.GenericGenerator;
 
 import java.util.Objects;
-import java.util.UUID;
 
 @Entity
 @Table(name = "node")
 public class Node {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "uuid2")
-    @GenericGenerator(name = "uuid2", strategy = "uuid2")
-    @Column(name = "id", columnDefinition = "BINARY(16)")
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @Column(name = "texto")
     private String texto;
@@ -125,5 +121,13 @@ public class Node {
     @Override
     public int hashCode() {
         return Objects.hash(id, texto, nivelAtual, nodeDireito, nodeEsquerdo);
+    }
+
+    @Override
+    public String toString() {
+        return "Node{" +
+                "id=" + id +
+                ", texto='" + texto.toUpperCase() + '\'' +
+                '}';
     }
 }

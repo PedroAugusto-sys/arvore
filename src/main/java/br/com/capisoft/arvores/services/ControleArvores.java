@@ -3,13 +3,21 @@ package br.com.capisoft.arvores.services;
 import br.com.capisoft.arvores.models.Arvore;
 import br.com.capisoft.arvores.models.DirecaoNode;
 import br.com.capisoft.arvores.models.Node;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+@Component
 public class ControleArvores {
+
+    private static Logger LOG = LoggerFactory.getLogger(ControleArvores.class);
 
     private Arvore arvore;
 
     public ControleArvores(Arvore arvore){
         this.arvore = arvore;
+        this.arvore.adicionarNaListaDePalavras(arvore.getRoot().getTexto());
     }
 
     public Arvore getArvore(){
@@ -17,9 +25,11 @@ public class ControleArvores {
     }
 
     public void adicionarNaArvore(Node node){
-        if (arvore.contemRaiz()){
+        if (!arvore.contemRaiz()){
+            LOG.info("Arvore está vazia, vou adicionar nova arvore com o root ->"+node.toString());
             arvore.setRoot(node);
         } else {
+            LOG.info("Vou adicionar o node -> "+node.toString());
             preencherArvore(arvore.getRoot(), node);
         }
     }
@@ -36,6 +46,7 @@ public class ControleArvores {
     }
 
     private Node rotacaoEsquerda(Node node){
+        LOG.info("Rotacao para a esquerda iniciada no node "+node.toString());
         Node x = node.getNoDireito();
         Node z = x.getNoEsquerdo();
         x.setNodeEsquerdo(node);
@@ -83,10 +94,16 @@ public class ControleArvores {
     private void preencherArvore(Node raiz, Node novoNode){
         if (raiz == null){
             raiz = novoNode;
+            LOG.info("raiz "+raiz+" vazia, vou adicionar o node de texto ->"+novoNode.getTexto().toUpperCase());
             adicionarNode(raiz, novoNode, DirecaoNode.NODE_ATUAL);
         }
-        int res = raiz.getTexto().compareTo(novoNode.getTexto());
+        int res = raiz.getTexto().compareTo(novoNode.getTexto().toUpperCase());
+        if (res == 0){
+            LOG.info("o novo node "+novoNode+" já está na arvore, vou adicionar a contagem de palavras");
+            arvore.adicionarNaListaDePalavras(novoNode.getTexto().toUpperCase());
+        }
         if (res < 0){
+            LOG.info("node central "+raiz.getTexto()+" é maior que o node "+ novoNode.getTexto()+", vou inseri-lo na Esquerda");
             if (raiz.contemNoEsquerdo()){
                 novoNode.adicionarNivel();
                 this.preencherArvore(raiz.getNoEsquerdo(),novoNode);
@@ -94,6 +111,7 @@ public class ControleArvores {
                 adicionarNode(raiz,novoNode,DirecaoNode.ESQUERDA);
             }
         } else if (res > 0){
+            LOG.info("node central "+raiz.getTexto().toUpperCase()+" é menor que o node "+ novoNode.getTexto().toUpperCase()+", vou inseri-lo na Direita");
             if (raiz.contemNoDireito()) {
                 novoNode.adicionarNivel();
                 this.preencherArvore(raiz.getNoDireito(),novoNode);
@@ -105,14 +123,18 @@ public class ControleArvores {
 
     private void adicionarNode(Node raiz, Node novoNode, DirecaoNode direcao){
         if(direcao == DirecaoNode.NODE_ATUAL){
+            LOG.info("o novo node "+novoNode.getTexto().toUpperCase()+" foi adicionado na árvore");
             raiz = novoNode;
         }
         if (direcao == DirecaoNode.ESQUERDA){
+            LOG.info("o novo node "+novoNode.getTexto().toUpperCase()+" adicionado ESQUERDA do node "+raiz.getTexto().toUpperCase());
             raiz.adicionarNaEsquerda(novoNode);
         } else {
+            LOG.info("o novo node "+novoNode.getTexto().toUpperCase()+" adicionado DIREITA do node "+raiz.getTexto().toUpperCase());
             raiz.adicionarNaDireita(novoNode);
         }
         novoNode.adicionarNivel();
-        rebalanceamento(raiz);
+        arvore.adicionarNaListaDePalavras(novoNode.getTexto());
+        //rebalanceamento(raiz);
     }
 }
