@@ -1,5 +1,6 @@
 package br.com.capisoft.arvores.models;
 
+import br.com.capisoft.arvores.models.DTOs.NodeSimplesDTO;
 import jakarta.persistence.*;
 
 import java.util.Objects;
@@ -12,7 +13,7 @@ public class Node {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "texto")
+    @Column(name = "palavra")
     private String texto;
 
     @Column(name = "nivel_atual")
@@ -33,6 +34,8 @@ public class Node {
     public Node(String texto) {
         this.texto = texto;
     }
+
+    public Node(){}
 
     public Node getNoDireito(){
        return this.nodeDireito;
@@ -110,6 +113,18 @@ public class Node {
         this.nodeDireito = node;
     }
 
+    public Long getId() {
+        return this.id;
+    }
+
+    public NodeSimplesDTO getDTO(){
+        return new NodeSimplesDTO(
+                this.getId(),
+                this.getTexto(),
+                this.getNivelAtual()
+        );
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -125,9 +140,6 @@ public class Node {
 
     @Override
     public String toString() {
-        return "Node [" +
-                "ID: " + id +
-                " | TEXTO: '" + texto.toUpperCase() + '\'' +
-                ']';
+        return "NODE['" + texto.toUpperCase() + "\']";
     }
 }

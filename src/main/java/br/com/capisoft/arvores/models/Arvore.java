@@ -44,6 +44,8 @@ public class Arvore {
         root.adicionarNivel();
     }
 
+    public Arvore(){}
+
     public boolean contemRaiz(){
         return this.root != null;
     }
@@ -62,6 +64,14 @@ public class Arvore {
 
     public void diminuirAltura(){
         this.altura--;
+    }
+
+    public boolean isAVL(){
+        return this.isAVL;
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public void adicionarNaListaDePalavras(String palavra){
@@ -97,6 +107,6 @@ public class Arvore {
 
     @Override
     public String toString() {
-        return "ARVORE {ID=" + id + ", RAIZ=" + root.toString() + ", isAVL=" + isAVL + '}';
+        return "ARVORE *[RAIZ=" + root.toString() + ", é AVL? =" + (isAVL ?"SIM":"NAO") + "]*";
     }
 }

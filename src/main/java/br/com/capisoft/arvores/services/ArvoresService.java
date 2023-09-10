@@ -1,6 +1,7 @@
 package br.com.capisoft.arvores.services;
 
 import br.com.capisoft.arvores.models.Arvore;
+import br.com.capisoft.arvores.models.DTOs.GerarDTO;
 import br.com.capisoft.arvores.models.Node;
 import br.com.capisoft.arvores.repositories.ArvoreRepository;
 import br.com.capisoft.arvores.repositories.NodeRepository;
@@ -21,8 +22,7 @@ public class ArvoresService {
 
     private Dados dados = new Dados();
 
-    private ControleArvores arvoreSimples;
-    private ControleArvores arvoreAVL;
+    private ControleArvores arvoreControl;
 
     @Autowired
     private ArvoreRepository arvores;
@@ -36,11 +36,16 @@ public class ArvoresService {
     }
 
     public ResponseEntity obterTXTMontarArvoreSimples(MultipartFile arquivo) throws IOException {
-        Arvore arv = null;
         for (String palavraNode : dados.carregarListaDePalavras(arquivo)){
-            arv = adicionarNaArvore(palavraNode,false);
+            adicionarNaArvore(palavraNode,false);
         }
-        return ResponseEntity.ok(salvarArvore(arv));
+        Arvore arv;
+        if (arvoreControl.getArvore().getId() != null){
+            arv = updateArvore(arvoreControl.getArvore());
+        } else {
+            arv = salvarArvore(arvoreControl.getArvore());
+        }
+        return ResponseEntity.ok(GerarDTO.daArvore(arv));
     }
 
     public ResponseEntity obterTXTEMontarArvoreAVL(MultipartFile arquivo) throws IOException {
@@ -61,31 +66,35 @@ public class ArvoresService {
         return ResponseEntity.ok(salvarArvore(arv));
     }
 
+    public ResponseEntity buscarNode(String textoDoNode){
+        Node no = Busca.binariaDaArvore(arvoreControl.getArvore(),textoDoNode);
+        if (no != null){
+            return ResponseEntity.ok(no.getDTO());
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
     private Arvore adicionarNaArvore(String textoNode, boolean isAVL){
         Node novoNode = new Node(textoNode);
         Arvore arvore = new Arvore(novoNode, isAVL);
-        if (isAVL){
-            if(arvoreAVL == null) {
-                LOG.info("Arvore AVL está vazia, vou iniciar ela com o root -> "+novoNode);
-                arvoreAVL = new ControleArvores(arvore);
-            } else {
-                arvoreAVL.adicionarNaArvore(novoNode);
-            }
-            return arvoreAVL.getArvore();
+        if (arvoreControl == null){
+            LOG.info("Arvore está vazia, vou iniciar ela com o root -> "+novoNode+ (isAVL ? ", tipo será AVL." : " sem balanceamento, tipo Simples binária."));
+            arvoreControl = new ControleArvores(arvore);
         } else {
-            if (arvoreSimples == null){
-                LOG.info("Arvore SIMPLES está vazia, vou iniciar ela com o root -> "+novoNode);
-                arvoreSimples = new ControleArvores(arvore);
-            } else {
-                arvoreSimples.adicionarNaArvore(novoNode);
-            }
-            return arvoreSimples.getArvore();
+            arvoreControl.adicionarNaArvore(novoNode);
         }
+        return arvoreControl.getArvore();
     }
 
     private Arvore salvarArvore(Arvore arvore){
         arvore.setRoot(salvarNodes(arvore.getRoot()));
         return arvores.save(arvore);
+    }
+
+    private Arvore updateArvore(Arvore arvore){
+        Arvore find = arvores.findById(arvore.getId()).get();
+        return arvores.save(find);
     }
 
     private Node salvarNodes(Node no){

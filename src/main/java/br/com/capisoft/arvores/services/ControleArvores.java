@@ -27,7 +27,7 @@ public class ControleArvores {
             arvore.setRoot(node);
         } else {
             //Aqui realiza a busca na árvore se tal node já está presente na árvore, se sim apenas acrescenta na contagem de palavras, se não então insere na árvore
-            LOG.info("Vou iniciar uma Busca Binária na arvore "+arvore.toString()+" e verificar se contém o Node "+node.getTexto());
+            LOG.info("Vou iniciar uma Busca Binária na "+arvore.toString()+" e verificar se contém o Node "+node.getTexto().toUpperCase());
             Node no = Busca.binariaDaArvore(this.arvore,node.getTexto());
             if(no != null){
                 LOG.info("Node com texto "+node.getTexto().toUpperCase()+" foi encontrado na árvore, logo, não irei preencher, apenas adicionar a contagem de palavras");
@@ -97,9 +97,12 @@ public class ControleArvores {
 
     //Adicionando na Arvore
     private Node preencherArvore(Node raiz, Node novoNode){
+        String raizPalavra = raiz.getTexto().toUpperCase();
+        String nodePalavra = novoNode.getTexto().toUpperCase();
+
         if (raiz == null){
             raiz = novoNode;
-            LOG.info("raiz "+raiz+" vazia, vou adicionar o node de texto ->"+novoNode.getTexto().toUpperCase());
+            LOG.info("Raiz "+raiz+" vazia, vou adicionar o node de texto ->"+novoNode.getTexto().toUpperCase());
             return adicionarNode(raiz, novoNode, DirecaoNode.NODE_ATUAL);
         }
         int res = raiz.getTexto()
@@ -107,19 +110,19 @@ public class ControleArvores {
                 .toLowerCase()
                 .compareTo(novoNode.getTexto().trim().toLowerCase());
         if (res == 0){
-            LOG.info("o novo node "+novoNode+" já está na arvore, vou adicionar a contagem de palavras");
-            arvore.adicionarNaListaDePalavras(novoNode.getTexto().toUpperCase());
+            LOG.info("O novo node "+nodePalavra+" já está na arvore, vou adicionar a contagem de palavras");
+            arvore.adicionarNaListaDePalavras(nodePalavra);
         }
-        if (res < 0){
-            LOG.info("node central "+raiz.getTexto()+" é maior que o node "+ novoNode.getTexto()+", vou inseri-lo na Esquerda");
+        if (res > 0){
+            LOG.info("Node central "+raizPalavra+" é maior que o node "+ nodePalavra+", vou inserir node "+nodePalavra+" na Esquerda do "+raizPalavra);
             if (raiz.contemNoEsquerdo()){
                 novoNode.adicionarNivel();
                 return preencherArvore(raiz.getNoEsquerdo(),novoNode);
             } else {
                 return adicionarNode(raiz,novoNode,DirecaoNode.ESQUERDA);
             }
-        } else if (res > 0){
-            LOG.info("node central "+raiz.getTexto().toUpperCase()+" é menor que o node "+ novoNode.getTexto().toUpperCase()+", vou inseri-lo na Direita");
+        } else {
+            LOG.info("Node central "+raizPalavra+" é menor que o node "+ nodePalavra+", vou inserir node "+nodePalavra+" na Direita do "+raizPalavra);
             if (raiz.contemNoDireito()) {
                 novoNode.adicionarNivel();
                 return preencherArvore(raiz.getNoDireito(),novoNode);
@@ -127,24 +130,26 @@ public class ControleArvores {
                 return adicionarNode(raiz,novoNode,DirecaoNode.DIREITA);
             }
         }
-        return null;
     }
 
     private Node adicionarNode(Node raiz, Node novoNode, DirecaoNode direcao){
         if(direcao == DirecaoNode.NODE_ATUAL){
-            LOG.info("o novo node "+novoNode.getTexto().toUpperCase()+" foi adicionado na árvore");
+            LOG.info("O node "+novoNode.getTexto().toUpperCase()+" foi adicionado na árvore");
             raiz = novoNode;
         }
         if (direcao == DirecaoNode.ESQUERDA){
-            LOG.info("o novo node "+novoNode.getTexto().toUpperCase()+" adicionado ESQUERDA do node "+raiz.getTexto().toUpperCase());
+            LOG.info("O node "+novoNode.getTexto().toUpperCase()+" adicionado ESQUERDA do node "+raiz.getTexto().toUpperCase());
             raiz.adicionarNaEsquerda(novoNode);
         } else {
-            LOG.info("o novo node "+novoNode.getTexto().toUpperCase()+" adicionado DIREITA do node "+raiz.getTexto().toUpperCase());
+            LOG.info("O node "+novoNode.getTexto().toUpperCase()+" adicionado DIREITA do node "+raiz.getTexto().toUpperCase());
             raiz.adicionarNaDireita(novoNode);
         }
         novoNode.adicionarNivel();
         arvore.adicionarNaListaDePalavras(novoNode.getTexto());
-        //rebalanceamento(raiz);
+        if (arvore.isAVL()){
+            LOG.info("Como é uma arvore AVL, vou rebalancea-la.");
+            rebalanceamento(raiz);
+        }
         return novoNode;
     }
 }
