@@ -26,6 +26,8 @@ public class Palavra {
         this.quantidade = 1;
     }
 
+    public Palavra(){}
+
     @ManyToOne
     @JoinColumn(name = "arvore_id")
     private Arvore arvore;

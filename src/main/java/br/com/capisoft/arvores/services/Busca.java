@@ -14,15 +14,14 @@ public class Busca {
         LOG.info("INICIANDO BUSCA BINÁRIA NA "+arvore.toString());
         Node no = buscaBinaria(arvore.getRoot(), textoDoNodeBuscado);
         if (no == null) {
-            LOG.info("BUSCA BINARIA | NADA ENCONTRADO | Node \""+textoDoNodeBuscado.toUpperCase()+"\" NÃO encontrado na árvore.");
+            LOG.info("BUSCA BINARIA | NÃO ENCONTRADO | Node \""+textoDoNodeBuscado.toUpperCase()+"\" NÃO encontrado na árvore.");
         } else {
-            LOG.info("BUSCA BINARIA | NADA ENCONTRADO | Node \""+textoDoNodeBuscado.toUpperCase()+"\" foi encontrado na árvore.");
+            LOG.info("BUSCA BINARIA | ENCONTRADO | Node \""+textoDoNodeBuscado.toUpperCase()+"\" foi encontrado na árvore.");
         }
         return no;
     }
 
     public static Node binariaNoNode(Node node, String textoDoNodeBuscado){
-        LOG.info("----------------------------------------------");
         LOG.info("VOU REALIZAR UMA BUSCA BINÁRIA NA ARVORE "+node.toString());
         Node no = buscaBinaria(node, textoDoNodeBuscado);
         if (no == null) {
@@ -45,15 +44,15 @@ public class Busca {
             LOG.info("BUSCA BINARIA | NODE ENCONTRADO! | "+node);
             return node;
         }
-        if (res < 0){
+        if (res > 0){
             if (node.contemNoEsquerdo()){
                 LOG.info("BUSCA BINARIA | <<< ESQUERDA <<< | verificando na esquerda do \""+node+"\"");
-                buscaBinaria(node.getNoEsquerdo(), texto);
+                return buscaBinaria(node.getNoEsquerdo(), texto);
             }
         } else {
             if (node.contemNoDireito()){
                 LOG.info("BUSCA BINARIA | >>> DIREITA >>> | verificando na direita do \""+node+"\"");
-                buscaBinaria(node.getNoDireito(), texto);
+                return buscaBinaria(node.getNoDireito(), texto);
             }
         }
         return null;
